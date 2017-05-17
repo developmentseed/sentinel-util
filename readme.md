@@ -1,11 +1,11 @@
-#Sentinel Util
+# Sentinel Util
 Sentinel Util is a command line utility to create a mosaic from Sentinel images.
 
-###Install
+### Install
 1. Install GDAL and Gippy v1.0.0b8
 2. Download the repo
 
-###Use
+### Use
 `python sentinel-util.py out bbox username password [-m mission] [-b beginning] [-e end] [-t type] [-p maxProducts]`
 
 **out**
@@ -34,7 +34,7 @@ Sentinel Util is a command line utility to create a mosaic from Sentinel images.
 
 **-p maxProducts**
     Default 100. Must be a positive integer ≤ 100. Limits the number of products downloaded.
-###What will happen
+### What will happen
 1. It will download up to 100 products that match the search criteria
 2. Each of the images in the products will be reduced from 16bit to 8bit and switched to WebMercator
 3. All the images will be stitched into a mosaic
