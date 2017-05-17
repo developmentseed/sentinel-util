@@ -1,9 +1,13 @@
-import requests
-import homura
-from osgeo import gdal
+import os
+import sys
+import zipfile
+
 import gippy
-import sys, zipfile, os
-import algorithms
+import homura
+import requests
+from osgeo import gdal
+
+from lib import algorithms
 
 MIDNIGHT = 'T00:00:00.000Z'
 ABS_START = '2014-01-01T00:00:00.000Z'
@@ -100,7 +104,7 @@ def main(args=None):
         img.set_nodata(0)
         geoimgs.append(img)
     print files
-    algorithms.cookie_cutter(geoimgs, outDir+'/mosaic', xres=10.0, yres=10.0, proj='EPSG:3857')
+    algorithms.cookie_cutter(geoimgs, outDir + '/mosaic', xres=10.0, yres=10.0, proj='EPSG:3857')
 
 
 
@@ -144,7 +148,3 @@ def warp(filename, dirname):
     file = gdal.Open(tempfile)
     gdal.Translate(filename, file, outputType=gdal.GDT_Byte)
     os.remove(tempfile)
-
-
-#process('/Users/devmcdevlin/Desktop/Power-Infrastructure/products/test.SAFE/measurement/vv.tiff')
-main('self /Users/devmcdevlin/PythonProjects/sentinel-util/out -2.7,51.4,1.5,53.3 eliDevelopmentSeed el518011 -m 1 -p 2')
