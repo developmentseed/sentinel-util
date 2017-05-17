@@ -3,7 +3,6 @@ import homura
 from osgeo import gdal
 import gippy
 import sys, zipfile, os
-from shutil import copyfile
 import algorithms
 
 MIDNIGHT = 'T00:00:00.000Z'
@@ -29,7 +28,7 @@ def main(args=None):
     args = args.split(' ')
     i = 5
     maxRows = '100'
-    file = args[1] #where to put the mosaic
+    outDir = args[1] #where to put the mosaic
     bbox = args[2] #corners of the bounding box
     username = args[3]
     password = args[4]
@@ -84,7 +83,7 @@ def main(args=None):
         print 'API response not valid. JSON decoding failed.'
 
     entries = json_feed.get('entry', [])
-    #download_all(entries)
+    download_all(entries)
     #add the images to the list
     for dir in os.listdir(UNZIP_DIR):
         if dir[len(dir)-5:] == '.SAFE':
@@ -92,7 +91,7 @@ def main(args=None):
             dir = UNZIP_DIR + dir
             for file in os.listdir(dir):
                 if file.endswith('tiff'):
-                    #toByte(file, dir)
+                    warp(file, dir)
                     thisFile = dir + file
                     files.append(thisFile)
     geoimgs = []
@@ -100,7 +99,8 @@ def main(args=None):
         img = gippy.GeoImage(file)
         img.set_nodata(0)
         geoimgs.append(img)
-    algorithms.cookie_cutter(geoimgs, DATA_DIR+'mosaic', xres=10.0, yres=10.0, proj='EPSG:3857')
+    print files
+    algorithms.cookie_cutter(geoimgs, outDir+'/mosaic', xres=10.0, yres=10.0, proj='EPSG:3857')
 
 
 
@@ -135,11 +135,12 @@ def parse_bbox(string):
     return cords
 
 
-#change from 16bit to 8bit using gdalTranslate
-def toByte(filename, dirname):
+#change from 16bit to 8bit using gdalTranslate, project to EPSG:3857
+def warp(filename, dirname):
     tempfile = dirname + 'temp_' + filename
     filename = dirname + filename
-    copyfile(filename,tempfile)
+    file = gdal.Open(filename)
+    gdal.Warp(tempfile, file, dstSRS='EPSG:3857')
     file = gdal.Open(tempfile)
     gdal.Translate(filename, file, outputType=gdal.GDT_Byte)
     os.remove(tempfile)
