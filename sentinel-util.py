@@ -1,8 +1,10 @@
-import requests, homura
+import requests
+import homura
 from osgeo import gdal
+import gippy
 import sys, zipfile, os
 from shutil import copyfile
-import gdal_merge
+import algorithms
 
 MIDNIGHT = 'T00:00:00.000Z'
 ABS_START = '2014-01-01T00:00:00.000Z'
@@ -82,7 +84,7 @@ def main(args=None):
         print 'API response not valid. JSON decoding failed.'
 
     entries = json_feed.get('entry', [])
-    download_all(entries)
+    #download_all(entries)
     #add the images to the list
     for dir in os.listdir(UNZIP_DIR):
         if dir[len(dir)-5:] == '.SAFE':
@@ -90,13 +92,16 @@ def main(args=None):
             dir = UNZIP_DIR + dir
             for file in os.listdir(dir):
                 if file.endswith('tiff'):
-                    #process(file, dir)
+                    #toByte(file, dir)
                     thisFile = dir + file
                     files.append(thisFile)
-    print files
-    gdal.Warp(DATA_DIR+'mosaic.tiff', files, dstSRS='EPSG:3857')
-    #sys.argv = ['-n', '0.0', '-o'] + [DATA_DIR+'mosaic.tiff'] + files
-    #gdal_merge.main()
+    geoimgs = []
+    for file in files:
+        img = gippy.GeoImage(file)
+        img.set_nodata(0)
+        geoimgs.append(img)
+    algorithms.cookie_cutter(geoimgs, DATA_DIR+'mosaic', xres=10.0, yres=10.0, proj='EPSG:3857')
+
 
 
 def download_all(entries):
@@ -105,10 +110,10 @@ def download_all(entries):
         url = entry['link'][0]['href']
         print 'downloading product ' + str(i)
         filepath = ZIP_DIR + str(i) + '.zip'
-        #homura.download(url=url, auth=session.auth, path=filepath)
-        #zip_ref = zipfile.ZipFile(filepath, 'r')
-        #zip_ref.extractall(UNZIP_DIR)
-        #zip_ref.close()
+        homura.download(url=url, auth=session.auth, path=filepath)
+        zip_ref = zipfile.ZipFile(filepath, 'r')
+        zip_ref.extractall(UNZIP_DIR)
+        zip_ref.close()
     print 'finished downloads'
 
 
@@ -130,11 +135,11 @@ def parse_bbox(string):
     return cords
 
 
-def process(filename, dirname):
+#change from 16bit to 8bit using gdalTranslate
+def toByte(filename, dirname):
     tempfile = dirname + 'temp_' + filename
     filename = dirname + filename
-    file = gdal.Open(filename)
-    gdal.Warp(tempfile, file, dstSRS='EPSG:3857')
+    copyfile(filename,tempfile)
     file = gdal.Open(tempfile)
     gdal.Translate(filename, file, outputType=gdal.GDT_Byte)
     os.remove(tempfile)
