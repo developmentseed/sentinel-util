@@ -86,7 +86,9 @@ def main(args=None):
         json_feed = response.json()['feed']
         total_results = int(json_feed['opensearch:totalResults'])
     except (ValueError, KeyError):
-        print 'API response not valid. JSON decoding failed.'
+        print(response)
+        print 'API response not valid. JSON decoding failed. Exiting with code 3.'
+        exit(3)
 
     entries = json_feed.get('entry', [])
     download_all(entries)
