@@ -30,7 +30,7 @@ def main(args=None):
     if args is None:
         args = sys.argv
     args = args.split(' ')
-    i = 5
+    print args
     maxRows = '100'
     outDir = args[1] #where to put the mosaic
     bbox = args[2] #corners of the bounding box
@@ -40,6 +40,7 @@ def main(args=None):
     mission = "1" #min sense time
     end = "NOW" #max sense time
     beginning = ABS_START
+    i = 5
     while i<len(args):
         arg = args[i]
         if arg == '-m':
@@ -148,3 +149,4 @@ def warp(filename, dirname):
     file = gdal.Open(tempfile)
     gdal.Translate(filename, file, outputType=gdal.GDT_Byte)
     os.remove(tempfile)
+
