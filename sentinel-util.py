@@ -129,7 +129,7 @@ def parse_bbox(string):
     nums = string.split(',')
     if len(nums) != 4:
         print("Bbox must contain exactly 4 comma seperated decimal degrees, recieved " + len(nums))
-        print(CODE_1_MEANING)
+        print(CODE_2_MEANING)
         sys.exit(1)
     lat1 = nums[0]
     lon1 = nums[1]
