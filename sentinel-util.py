@@ -7,14 +7,14 @@ import homura
 import requests
 from osgeo import gdal
 
-from lib import algorithms
+from gippy import algorithms
 
 MIDNIGHT = 'T00:00:00.000Z'
 ABS_START = '2014-01-01T00:00:00.000Z'
 INGESTION_KEYWORD = 'ingestiondate'
 FOOTPRINT_KEYWORD = 'footprint:"intersects('
 POLYGON_KEYWORD = 'POLYGON(('
-CODE_1_MEANING = 'Code 1: invalid arguements'
+CODE_2_MEANING = 'Code 2: invalid arguements'
 POINT_DELIM = ', '
 URL_START = 'https://scihub.copernicus.eu/dhus/search?q='
 QUERY_DELIM = ' AND '
@@ -27,10 +27,12 @@ PRODUCT_KEYWORD = 'producttype:'
 
 #TODO: create more catches for invalid agruments
 def main(args=None):
+    print('started')
     if args is None:
         args = sys.argv
-    args = args.split(' ')
-    print args
+    if isinstance(args, str):
+        args = args.split(' ')
+    i = 5
     maxRows = '100'
     outDir = args[1] #where to put the mosaic
     bbox = args[2] #corners of the bounding box
@@ -40,7 +42,6 @@ def main(args=None):
     mission = "1" #min sense time
     end = "NOW" #max sense time
     beginning = ABS_START
-    i = 5
     while i<len(args):
         arg = args[i]
         if arg == '-m':
@@ -60,8 +61,8 @@ def main(args=None):
             type = args[i].upper()
         else:
             print('Unrecognized flag ' + arg)
-            print(CODE_1_MEANING)
-            sys.exit(1)
+            print(CODE_2_MEANING)
+            sys.exit(2)
         i += 1
     #create strings that will be used as options for querying scihub
     ingestOption = INGESTION_KEYWORD + ':[' + beginning + ' TO ' + end + ']'
@@ -85,7 +86,9 @@ def main(args=None):
         json_feed = response.json()['feed']
         total_results = int(json_feed['opensearch:totalResults'])
     except (ValueError, KeyError):
-        print 'API response not valid. JSON decoding failed.'
+        print(response)
+        print 'API response not valid. JSON decoding failed. Exiting with code 3.'
+        exit(3)
 
     entries = json_feed.get('entry', [])
     download_all(entries)
@@ -149,4 +152,10 @@ def warp(filename, dirname):
     file = gdal.Open(tempfile)
     gdal.Translate(filename, file, outputType=gdal.GDT_Byte)
     os.remove(tempfile)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (KeyboardInterrupt):
+        exit('Received Ctrl + C... Exiting', 1)
 
