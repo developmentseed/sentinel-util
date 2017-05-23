@@ -78,9 +78,10 @@ def main(args=None):
         productOption = ''
     #there's no QUERY_DELIM between product option and platform option because product option is sometime blank
     queryURL = URL_START + ingestOption + QUERY_DELIM + footprintOption + QUERY_DELIM + productOption\
-               + platformOption + '&' + '&rows=' + maxRows + '&start=0&format=json'
+               + platformOption + '&rows=' + maxRows + '&start=0&format=json'
     queryURL = queryURL.replace(' ', '%20')
     session.auth = (username, password)
+    print queryURL
     response = session.post(queryURL, auth=session.auth)
     try:
         json_feed = response.json()['feed']
@@ -129,12 +130,28 @@ def parse_bbox(string):
     nums = string.split(',')
     if len(nums) != 4:
         print("Bbox must contain exactly 4 comma seperated decimal degrees, recieved " + len(nums))
-        print(CODE_1_MEANING)
-        sys.exit(1)
+        print(CODE_2_MEANING)
+        sys.exit(2)
     lat1 = nums[0]
     lon1 = nums[1]
     lat2 = nums[2]
     lon2 = nums[3]
+    if not float(lat1) > float(lat2):
+        print("Latitude1 was less than Latitude2")
+        print(CODE_2_MEANING)
+        sys.exit(2)
+    elif not float(lon2) > float(lon1):
+        print("Longitude2 was less than Longitude1")
+        print(CODE_2_MEANING)
+        sys.exit(2)
+    elif abs(float(lat1)-float(lat2)) > 10:
+        print("The bbox was taller than 10 degrees")
+        print(CODE_2_MEANING)
+        sys.exit(2)
+    elif abs(float(lon1)-float(lon2)) > 10:
+        print("The bbox was wider than 10 degrees")
+        print(CODE_2_MEANING)
+        sys.exit(2)
     cords = []
     cords.append(lat1 + " " + lon1) #top left
     cords.append(lat1 + " " + lon2) #top right
@@ -152,6 +169,8 @@ def warp(filename, dirname):
     file = gdal.Open(tempfile)
     gdal.Translate(filename, file, outputType=gdal.GDT_Byte)
     os.remove(tempfile)
+
+#main('sentinel-util.py ./data 53.3,-3,51,1.7 eliDevelopmentSeed el518011 -m 1 -b 2017-04-01 -p 4')
 
 if __name__ == "__main__":
     try:
