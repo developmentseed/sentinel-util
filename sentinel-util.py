@@ -171,7 +171,6 @@ def warp(filename, dirname):
     gdal.Translate(filename, file, outputType=gdal.GDT_Byte)
     os.remove(tempfile)
 
-main('sentinel-util.py ./data 53.3,-3,51,1.7 eliDevelopmentSeed el518011 -m 1 -b 2017-04-01 -p 4')
 
 if __name__ == "__main__":
     try:
