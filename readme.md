@@ -2,8 +2,10 @@
 Sentinel Util is a command line utility to create a mosaic from Sentinel images.
 
 ### Install
-1. Install GDAL and Gippy v1.0.0b8
-2. Download the repo
+1. Install Conda (on linux, use curl -o install <installerurl>)
+2. Install gcc
+3. Install GDAL and Gippy v1.0.0b8 (and dependencies: swig, g++, etc.)
+4. Download the repo
 
 ### Use
 `python sentinel-util.py out bbox username password [-m mission] [-b beginning] [-e end] [-t type] [-p maxProducts]`
