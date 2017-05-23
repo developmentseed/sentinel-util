@@ -32,11 +32,16 @@ def main(args=None):
     i = 5
     maxRows = '100'
     outDir = args[1] #where to put the mosaic
-    zipDir = outDir + '/zip/'
-    unzipDir = outDir + '/unzip/'
-    os.mkdir(outDir)
-    os.mkdir(zipDir)
-    os.mkdir(unzipDir)
+    zipDir = outDir + '/zip/' #where to put downloads
+    unzipDir = outDir + '/unzip/' #where to put working files
+
+    #create directory to store downloads, output, and working files
+    if not os.path.isdir(outDir):
+        os.mkdir(outDir)
+    if not os.path.isdir(zipDir):
+        os.mkdir(zipDir)
+    if not os.path.isdir(unzipDir):
+        os.mkdir(unzipDir)
     bbox = args[2] #corners of the bounding box
     username = args[3]
     password = args[4]
