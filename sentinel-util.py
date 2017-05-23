@@ -20,9 +20,6 @@ URL_START = 'https://scihub.copernicus.eu/dhus/search?q='
 QUERY_DELIM = ' AND '
 session = requests.Session()
 files = []
-DATA_DIR = './out/'
-ZIP_DIR = DATA_DIR + 'zip/'
-UNZIP_DIR = DATA_DIR + 'unzip/'
 PRODUCT_KEYWORD = 'producttype:'
 
 #TODO: create more catches for invalid agruments
@@ -35,6 +32,10 @@ def main(args=None):
     i = 5
     maxRows = '100'
     outDir = args[1] #where to put the mosaic
+    zipDir = outDir + 'zip/'
+    unzipDir = outDir + 'unzip/'
+    os.mkdir(zipDir)
+    os.mkdir(unzipDir)
     bbox = args[2] #corners of the bounding box
     username = args[3]
     password = args[4]
@@ -92,12 +93,12 @@ def main(args=None):
         exit(3)
 
     entries = json_feed.get('entry', [])
-    download_all(entries)
+    download_all(entries, zipDir, unzipDir)
     #add the images to the list
-    for dir in os.listdir(UNZIP_DIR):
+    for dir in os.listdir(unzipDir):
         if dir[len(dir)-5:] == '.SAFE':
             dir = dir + '/measurement/'
-            dir = UNZIP_DIR + dir
+            dir = unzipDir + dir
             for file in os.listdir(dir):
                 if file.endswith('tiff'):
                     warp(file, dir)
@@ -113,15 +114,15 @@ def main(args=None):
 
 
 
-def download_all(entries):
+def download_all(entries, zipDir, unzipDir):
     for i in range(0, len(entries)):
         entry = entries[i]
         url = entry['link'][0]['href']
         print 'downloading product ' + str(i)
-        filepath = ZIP_DIR + str(i) + '.zip'
+        filepath = zipDir + str(i) + '.zip'
         homura.download(url=url, auth=session.auth, path=filepath)
         zip_ref = zipfile.ZipFile(filepath, 'r')
-        zip_ref.extractall(UNZIP_DIR)
+        zip_ref.extractall(unzipDir)
         zip_ref.close()
     print 'finished downloads'
 
