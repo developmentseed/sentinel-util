@@ -32,8 +32,8 @@ def main(args=None):
     i = 5
     maxRows = '100'
     outDir = args[1] #where to put the mosaic
-    zipDir = outDir + 'zip/'
-    unzipDir = outDir + 'unzip/'
+    zipDir = outDir + '/zip/'
+    unzipDir = outDir + '/unzip/'
     os.mkdir(zipDir)
     os.mkdir(unzipDir)
     bbox = args[2] #corners of the bounding box
