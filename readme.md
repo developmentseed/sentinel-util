@@ -33,7 +33,9 @@ Sentinel Util is a command line utility to create a mosaic from Sentinel images.
     For Sentinel-1 only, defaults to GRD.
 
 **-p maxProducts**
-    Default 100. Must be a positive integer ≤ 100. Limits the number of products downloaded.
+    Default 100. Must be a positive integer ≤ 100. Limits the number of products downloaded.'
+
+Alternatively, to run in the background and continue even after closing your terminal window (helpful for running on servers), run like ```nohup python sentinel-util.py [args] &amp;```
 ### What will happen
 1. It will download up to 100 products that match the search criteria
 2. Each of the images in the products will be reduced from 16bit to 8bit and switched to WebMercator
