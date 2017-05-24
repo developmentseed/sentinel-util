@@ -267,18 +267,18 @@ class Homura(object):
         }
         if STREAM.isatty():
             p = (self.progress_template + '\r') % params
+            STREAM.write(p)
+            STREAM.flush()
         else:
             current_time = time.time()
             if self._last_time == 0.0:
                 self._last_time = current_time
+
             else:
                 interval = current_time - self._last_time
                 if interval < 0.5:
                     return
                 self._last_time = current_time
-            p = ("\r" + self.progress_template) % params
-        STREAM.write(p)
-        STREAM.flush()
         #what the final line should be
         params['percent']=100
         self._final_progress_params=params
@@ -289,7 +289,7 @@ class Homura(object):
             return self.content_length == os.path.getsize(self.path)
 
     def _done(self):
-        p = ("\r" + self.progress_template) % self._final_progress_params
+        p = (self.progress_template) % self._final_progress_params
         STREAM.write(p + '\n')
         STREAM.flush()
 
