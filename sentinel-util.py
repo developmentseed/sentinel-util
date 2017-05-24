@@ -29,7 +29,6 @@ def main(args=None):
         args = sys.argv
     if isinstance(args, str):
         args = args.split(' ')
-    i = 5
     maxRows = '100'
     outDir = args[1] #where to put the mosaic
     zipDir = outDir + '/zip/' #where to put downloads
@@ -49,6 +48,8 @@ def main(args=None):
     mission = "1" #min sense time
     end = "NOW" #max sense time
     beginning = ABS_START
+
+    i = 5 #argument index
     while i<len(args):
         arg = args[i]
         if arg == '-m':
